@@ -1,5 +1,5 @@
 import { SessionData } from "express-session";
-import { UnauthenticatedError } from "./errors";
+import { NotAllowedError, UnauthenticatedError } from "./errors";
 
 export type SessionDoc = SessionData;
 
@@ -24,6 +24,7 @@ export default class SessioningConcept {
     // Hint: Take a look at how the "end" function makes sure the user is logged in. Keep in mind that a
     // synchronization like starting a session should just consist of a series of actions that may throw
     // exceptions and should not have its own control flow.
+    this.isLoggedOut(session)
     session.user = username;
   }
 
@@ -35,6 +36,12 @@ export default class SessioningConcept {
   getUser(session: SessionDoc) {
     this.isLoggedIn(session);
     return session.user!;
+  }
+
+  isLoggedOut(session: SessionDoc) {
+    if(session.user !== undefined) {
+      throw new NotAllowedError("Must log out before a new login")
+    }
   }
 
   isLoggedIn(session: SessionDoc) {
